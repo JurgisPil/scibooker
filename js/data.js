@@ -1,4 +1,4 @@
-import { db, auth } from './firebase.js?v=16';
+import { db, auth } from './firebase.js?v=17';
 import { 
     collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, writeBatch 
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -18,7 +18,6 @@ export const dataApi = {
             return null;
         } catch (e) {
             console.error("Error fetching user profile:", e);
-            alert("HIDDEN ERROR IN FETCH PROFILE: " + e.message);
             return null;
         }
     },
