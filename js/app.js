@@ -1,7 +1,7 @@
-import { dataApi } from './data.js?v=20';
-import { auth, googleProvider } from './firebase.js?v=20';
+import { dataApi } from './data.js?v=21';
+import { auth, googleProvider } from './firebase.js?v=21';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
-import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=20';
+import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=21';
 
 window.addEventListener('error', function(e) {
     document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:99999;padding:20px;font-size:20px;">ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '</div>';
@@ -237,10 +237,14 @@ function setupEventListeners() {
             const prefix = document.getElementById('new-inst-prefix').value.trim();
             const count = parseInt(document.getElementById('new-inst-count').value);
             
-            await dataApi.addInstrument({ name, description: desc, channelPrefix: prefix, channelCount: count });
-            alert('Instrument created successfully!');
-            populateInstrumentSelect();
-            await render();
+            try {
+                await dataApi.addInstrument({ name, description: desc, channelPrefix: prefix, channelCount: count });
+                alert('Instrument created successfully!');
+                populateInstrumentSelect();
+                await render();
+            } catch (e) {
+                alert('ERROR SAVING INSTRUMENT: ' + e.message);
+            }
         } else if (e.target.id === 'form-add-allowlist') {
             e.preventDefault();
             const email = document.getElementById('new-allowlist-email').value.trim();

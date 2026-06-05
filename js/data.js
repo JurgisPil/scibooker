@@ -1,4 +1,4 @@
-import { db, auth } from './firebase.js?v=20';
+import { db, auth } from './firebase.js?v=21';
 import { 
     collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, writeBatch 
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -100,7 +100,13 @@ export const dataApi = {
             status: 'active', 
             channels 
         };
-        await setDoc(doc(db, 'instruments', id), newInst);
+        
+        // Timeout if offline or hanging
+        await Promise.race([
+            setDoc(doc(db, 'instruments', id), newInst),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout: Database is not responding. Check your internet or firewall.")), 5000))
+        ]);
+        
         return newInst;
     },
     async updateInstrument(id, updatedData) {
