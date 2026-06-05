@@ -89,28 +89,6 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
- else {
-        navAdmin.style.display = 'none';
-        if (state.currentView === 'admin-panel') {
-            state.currentView = 'dashboard';
-        }
-    }
-}
-
-
-" ${selected}>${u.name} (${u.role})</option>`;
-    });
-    userSwitcher.innerHTML = html;
-}
-
- else {
-        navAdmin.style.display = 'none';
-        if (state.currentView === 'admin-panel') {
-            state.currentView = 'dashboard';
-        }
-    }
-}
-
 // Helpers
 function getTodayStr() {
     const today = new Date();
