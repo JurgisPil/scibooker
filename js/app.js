@@ -153,7 +153,7 @@ function setupEventListeners() {
     }
     // Global Search
     if (globalSearchInput) {
-        globalSearchInput.addEventListener('input', (e) => {
+        globalSearchInput.addEventListener('input', async (e) => {
             state.searchQuery = e.target.value.toLowerCase().trim();
             if (state.currentView !== 'dashboard') {
                 state.currentView = 'dashboard';
@@ -166,7 +166,7 @@ function setupEventListeners() {
 
     // Navigation
     navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
+        item.addEventListener('click', async (e) => {
             e.preventDefault();
             navItems.forEach(nav => nav.classList.remove('active'));
             item.classList.add('active');
@@ -410,7 +410,7 @@ function setupEventListeners() {
         }
     });
 
-    instrumentSelect.addEventListener('change', (e) => {
+    instrumentSelect.addEventListener('change', async (e) => {
         populateChannelSelect(e.target.value);
     });
 
@@ -424,7 +424,7 @@ function setupEventListeners() {
         editInstModal.classList.add('hidden');
     }));
 
-    formEditInstrument.addEventListener('submit', (e) => {
+    formEditInstrument.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('edit-inst-id').value;
         const name = document.getElementById('edit-inst-name').value.trim();
@@ -446,7 +446,7 @@ function setupEventListeners() {
         editUserModal.classList.add('hidden');
     }));
 
-    formEditUser.addEventListener('submit', (e) => {
+    formEditUser.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('edit-user-id').value;
         const name = document.getElementById('edit-user-name').value.trim();
