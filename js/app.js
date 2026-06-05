@@ -57,10 +57,36 @@ let wasDragged = false;
 
 // Initialization
 
+async function updateUserUI() {
+    const user = await dataApi.getCurrentUser();
+    if (user) {
+        const avatarEl = document.getElementById('current-user-avatar');
+        if (avatarEl) avatarEl.textContent = user.avatar || user.name.substring(0, 2).toUpperCase();
+        
+        const nameEl = document.getElementById('current-user-name');
+        if (nameEl) nameEl.textContent = user.name;
+        
+        const roleEl = document.getElementById('current-user-role');
+        if (roleEl) roleEl.textContent = user.role;
+        
+        const navAdmin = document.querySelector('[data-view="admin-panel"]');
+        if (navAdmin) {
+            if (user.role === 'admin') {
+                navAdmin.style.display = 'flex';
+            } else {
+                navAdmin.style.display = 'none';
+                if (state.currentView === 'admin-panel') {
+                    state.currentView = 'dashboard';
+                }
+            }
+        }
+    }
+}
+
 async function init() {
     state.currentDate = new Date().toISOString().split('T')[0];
     await populateInstrumentSelect();
-    updateUserUI();
+    await updateUserUI();
     await render();
 }
 
@@ -466,9 +492,9 @@ function setupEventListeners() {
                 populateUserSwitcher();
                 
                 // Update current user UI if they edited themselves
-                const currentUser = dataApi.getCurrentUser();
+                const currentUser = await dataApi.getCurrentUser();
                 if (currentUser && currentUser.id === id) {
-                    updateUserUI();
+                    await updateUserUI();
                 }
                 
                 await render();
