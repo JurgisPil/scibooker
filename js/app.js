@@ -1,8 +1,8 @@
 // js/app.js
-import { dataApi } from './data.js';
-import { auth, googleProvider } from './firebase.js';
+import { dataApi } from './data.js?v=12';
+import { auth, googleProvider } from './firebase.js?v=12';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
-import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js';
+import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=12';
 
 // Application State
 const state = {
@@ -57,13 +57,14 @@ async function updateUserUI() {
     const user = await dataApi.getCurrentUser();
     if (user) {
         const avatarEl = document.getElementById('current-user-avatar');
-        if (avatarEl) avatarEl.textContent = user.avatar || user.name.substring(0, 2).toUpperCase();
+        const safeName = user.name || 'User';
+        if (avatarEl) avatarEl.textContent = user.avatar || safeName.substring(0, 2).toUpperCase();
         
         const nameEl = document.getElementById('current-user-name');
-        if (nameEl) nameEl.textContent = user.name;
+        if (nameEl) nameEl.textContent = safeName;
         
         const roleEl = document.getElementById('current-user-role');
-        if (roleEl) roleEl.textContent = user.role;
+        if (roleEl) roleEl.textContent = user.role || 'user';
         
         const navAdmin = document.querySelector('[data-view="admin-panel"]');
         if (navAdmin) {

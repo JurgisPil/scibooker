@@ -1,5 +1,5 @@
 // js/data.js
-import { db, auth } from './firebase.js';
+import { db, auth } from './firebase.js?v=12';
 import { 
     collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, writeBatch 
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -75,6 +75,7 @@ export const dataApi = {
         const snapshot = await getDocs(collection(db, 'instruments'));
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     },
+
     async getInstrumentById(id) {
         const d = await getDoc(doc(db, 'instruments', id));
         return d.exists() ? { id: d.id, ...d.data() } : null;
