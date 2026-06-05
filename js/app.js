@@ -128,27 +128,42 @@ function setupEventListeners() {
 
     
     if (authForm) {
-        authForm.addEventListener('submit', (e) => e.preventDefault());
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (btnLogin) btnLogin.click();
+        });
     }
     if (btnLogin) {
-        btnLogin.addEventListener('click', async () => {
+        btnLogin.addEventListener('click', async (e) => {
+            if (!authForm.checkValidity()) {
+                authForm.reportValidity();
+                return;
+            }
             try {
                 authError.style.display = 'none';
+                btnLogin.textContent = 'Loading...';
                 await signInWithEmailAndPassword(auth, authEmail.value, authPassword.value);
             } catch (err) {
                 authError.textContent = err.message;
                 authError.style.display = 'block';
+                btnLogin.textContent = 'Log In';
             }
         });
     }
     if (btnSignup) {
-        btnSignup.addEventListener('click', async () => {
+        btnSignup.addEventListener('click', async (e) => {
+            if (!authForm.checkValidity()) {
+                authForm.reportValidity();
+                return;
+            }
             try {
                 authError.style.display = 'none';
+                btnSignup.textContent = 'Loading...';
                 await createUserWithEmailAndPassword(auth, authEmail.value, authPassword.value);
             } catch (err) {
                 authError.textContent = err.message;
                 authError.style.display = 'block';
+                btnSignup.textContent = 'Sign Up';
             }
         });
     }
