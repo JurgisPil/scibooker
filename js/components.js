@@ -1,5 +1,4 @@
-// js/components.js
-import { dataApi } from './data.js?v=13';
+import { dataApi } from './data.js?v=14';
 
 export async function renderAdminPanel() {
     const users = await dataApi.getUsers();

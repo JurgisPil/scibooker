@@ -1,8 +1,7 @@
-// js/app.js
-import { dataApi } from './data.js?v=13';
-import { auth, googleProvider } from './firebase.js?v=13';
+import { dataApi } from './data.js?v=14';
+import { auth, googleProvider } from './firebase.js?v=14';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
-import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=13';
+import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=14';
 
 window.addEventListener('error', function(e) {
     document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:99999;padding:20px;font-size:20px;">ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '</div>';
@@ -96,41 +95,38 @@ async function init() {
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // Verify Allowlist FIRST
-        const isAllowed = await dataApi.isEmailAllowed(user.email);
-        if (!isAllowed) {
-            const errEl = document.getElementById('auth-error');
-            if(errEl) {
-                errEl.textContent = `Access Denied: Email ${user.email} is not authorized by the admin.`;
-                errEl.style.display = 'block';
+        try {
+            const isAllowed = await dataApi.isEmailAllowed(user.email);
+            if (!isAllowed) {
+                alert('Access Denied: Your email is not on the admin allowlist.');
+                await signOut(auth);
+                return;
             }
-            await signOut(auth);
-            return;
-        }
 
-        if(authOverlay) authOverlay.style.display = 'none';
-        await dataApi.seedDatabase(); // Ensure initial data exists
-        let profile = await dataApi.fetchUserProfile(user.uid);
-        if (!profile) {
-            // Create default profile if signed up
-            await dataApi.addUser({
-                id: user.uid,
-                name: user.displayName || user.email.split('@')[0],
-                role: user.email === 'j.pilipavicius@gmail.com' ? 'admin' : 'user',
-                avatar: user.photoURL ? null : user.email.substring(0, 2).toUpperCase(),
-                photoURL: user.photoURL || null,
-                email: user.email,
-                phone: '',
-                otherInfo: '',
-                allowedInstruments: []
-            });
-            profile = await dataApi.fetchUserProfile(user.uid);
-        } else if (profile.email === 'j.pilipavicius@gmail.com' && profile.role !== 'admin') {
-            // Auto-promote existing account
-            await dataApi.updateUser(user.uid, { role: 'admin' });
-            profile = await dataApi.fetchUserProfile(user.uid);
+            if(authOverlay) authOverlay.style.display = 'none';
+            await dataApi.seedDatabase(); // Ensure initial data exists
+            let profile = await dataApi.fetchUserProfile(user.uid);
+            if (!profile) {
+                await dataApi.addUser({
+                    id: user.uid,
+                    name: user.displayName || user.email.split('@')[0],
+                    role: user.email === 'j.pilipavicius@gmail.com' ? 'admin' : 'user',
+                    avatar: user.photoURL ? null : user.email.substring(0, 2).toUpperCase(),
+                    photoURL: user.photoURL || null,
+                    email: user.email,
+                    phone: '',
+                    otherInfo: '',
+                    allowedInstruments: []
+                });
+                profile = await dataApi.fetchUserProfile(user.uid);
+            } else if (profile.email === 'j.pilipavicius@gmail.com' && profile.role !== 'admin') {
+                await dataApi.updateUser(user.uid, { role: 'admin' });
+                profile = await dataApi.fetchUserProfile(user.uid);
+            }
+            init();
+        } catch (error) {
+            document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:99999;padding:20px;font-size:20px;">CRASH IN AUTH: ' + error.message + '</div>';
         }
-        init();
     } else {
         if(authOverlay) authOverlay.style.display = 'flex';
     }
