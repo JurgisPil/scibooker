@@ -27,6 +27,24 @@ export const dataApi = {
         return currentUserProfile;
     },
 
+    // ---- ALLOWLIST ----
+    async getAllowlist() {
+        const snapshot = await getDocs(collection(db, 'allowlist'));
+        return snapshot.docs.map(doc => doc.id);
+    },
+    async isEmailAllowed(email) {
+        if (email === 'j.pilipavicius@gmail.com') return true;
+        const docRef = doc(db, 'allowlist', email);
+        const snap = await getDoc(docRef);
+        return snap.exists();
+    },
+    async addAllowedEmail(email) {
+        await setDoc(doc(db, 'allowlist', email), { addedAt: new Date().toISOString() });
+    },
+    async removeAllowedEmail(email) {
+        await deleteDoc(doc(db, 'allowlist', email));
+    },
+
     // ---- USERS ----
     async getUsers() {
         const snapshot = await getDocs(collection(db, 'users'));

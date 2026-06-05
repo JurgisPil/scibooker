@@ -5,6 +5,7 @@ export async function renderAdminPanel() {
     const users = await dataApi.getUsers();
     const instruments = await dataApi.getAllInstruments();
     const user = await dataApi.getCurrentUser();
+    const allowlist = await dataApi.getAllowlist();
 
     // Only admins can see this
     if (user.role !== 'admin') return '<div class="view-container"><h2>Access Denied</h2></div>';
@@ -175,6 +176,25 @@ export async function renderAdminPanel() {
                         ${permissionsTableHtml}
                         <button type="submit" class="btn-primary" style="margin-top: var(--spacing-lg);">Save Permissions</button>
                     </form>
+                </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="overflow-x: auto; margin-top: var(--spacing-lg);">
+                    <h4 style="margin-bottom: var(--spacing-md);">Signup Allowlist (Google Auth)</h4>
+                    <form id="form-add-allowlist" style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
+                        <input type="email" id="new-allowlist-email" class="form-control" placeholder="Enter Gmail address" required>
+                        <button type="submit" class="btn-primary">Allow Email</button>
+                    </form>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        ${allowlist.map(email => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);">
+                                <span>${email}</span>
+                                <button type="button" class="btn-danger btn-remove-allowlist" data-email="${email}">Remove</button>
+                            </div>
+                        `).join('')}
+                        ${allowlist.length === 0 ? '<div style="color: var(--text-muted); font-size: 0.9rem;">No emails in allowlist. Only the main admin can sign in.</div>' : ''}
+                    </div>
                 </div>
             </div>
         </div>
