@@ -1,7 +1,7 @@
-import { dataApi } from './data.js?v=21';
-import { auth, googleProvider } from './firebase.js?v=21';
+import { dataApi } from './data.js?v=22';
+import { auth, googleProvider } from './firebase.js?v=22';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
-import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=21';
+import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=22';
 
 window.addEventListener('error', function(e) {
     document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:99999;padding:20px;font-size:20px;">ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '</div>';
@@ -668,9 +668,10 @@ async function populateInstrumentSelect() {
     instrumentSelect.innerHTML = html;
 }
 
-function populateChannelSelect(instrumentId) {
+async function populateChannelSelect(instrumentId) {
     if (!instrumentId) return;
-    const inst = dataApi.getInstrumentById(instrumentId);
+    const inst = await dataApi.getInstrumentById(instrumentId);
+    if (!inst) return;
     let html = '';
     inst.channels.forEach(ch => {
         html += `<label style="display: flex; align-items: center; gap: 4px; font-size: 0.85rem; cursor: pointer;">
@@ -711,7 +712,7 @@ async function handleBookingSubmit() {
     // Check for overlaps
     const newStart = new Date(startDate);
     const newEnd = new Date(endDate);
-    const allBookings = dataApi.getBookingsByInstrument(instrumentId);
+    const allBookings = await dataApi.getBookingsByInstrument(instrumentId);
     
     const conflictingChannels = [];
     selectedChannelIds.forEach(channelId => {
@@ -738,8 +739,8 @@ async function handleBookingSubmit() {
     }
 
     // Create a booking for each selected channel
-    selectedChannelIds.forEach(channelId => {
-        dataApi.addBooking({
+    const promises = selectedChannelIds.map(channelId => {
+        return dataApi.addBooking({
             instrumentId,
             channelId,
             startDate,
@@ -747,6 +748,12 @@ async function handleBookingSubmit() {
             purpose
         });
     });
+    
+    try {
+        await Promise.all(promises);
+    } catch (e) {
+        alert('ERROR SAVING BOOKING: ' + e.message);
+    }
 
     closeModal();
     // Re-render

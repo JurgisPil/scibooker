@@ -1,4 +1,4 @@
-import { db, auth } from './firebase.js?v=21';
+import { db, auth } from './firebase.js?v=22';
 import { 
     collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, writeBatch 
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -189,7 +189,12 @@ export const dataApi = {
             userId: currentUserProfile.id,
             userName: currentUserProfile.name
         };
-        await setDoc(doc(db, 'bookings', bookingId), newBooking);
+        
+        await Promise.race([
+            setDoc(doc(db, 'bookings', bookingId), newBooking),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout: Database is not responding.")), 5000))
+        ]);
+        
         return { id: bookingId, ...newBooking };
     },
     async updateBooking(bookingId, updatedData) {
