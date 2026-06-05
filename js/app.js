@@ -1,5 +1,7 @@
 // js/app.js
-import { dataApi, currentUser } from './data.js';
+import { dataApi } from './data.js';
+import { auth } from './firebase.js';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
 import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js';
 
 // Application State
@@ -27,7 +29,16 @@ const btnModalDelete = document.getElementById('btn-modal-delete');
 const btnModalSubmit = document.getElementById('btn-modal-submit');
 const modalTitle = document.getElementById('modal-title');
 const editingBookingIdInput = document.getElementById('editing-booking-id');
-const userSwitcher = document.getElementById('user-switcher');
+const currentUserName = document.getElementById('current-user-name');
+const currentUserRole = document.getElementById('current-user-role');
+const btnLogout = document.getElementById('btn-logout');
+const authOverlay = document.getElementById('auth-overlay');
+const authForm = document.getElementById('auth-form');
+const authEmail = document.getElementById('auth-email');
+const authPassword = document.getElementById('auth-password');
+const btnLogin = document.getElementById('btn-login');
+const btnSignup = document.getElementById('btn-signup');
+const authError = document.getElementById('auth-error');
 const currentUserAvatar = document.getElementById('current-user-avatar');
 const navAdmin = document.getElementById('nav-admin');
 
@@ -45,32 +56,55 @@ let dragState = null;
 let wasDragged = false;
 
 // Initialization
-function init() {
+
+async function init() {
     state.currentDate = new Date().toISOString().split('T')[0];
-    populateInstrumentSelect();
-    populateUserSwitcher();
+    await populateInstrumentSelect();
     updateUserUI();
     setupEventListeners();
-    render();
+    await await render();
 }
 
-function populateUserSwitcher() {
-    const users = dataApi.getUsers();
-    const currentUser = dataApi.getCurrentUser();
-    let html = '';
-    users.forEach(u => {
-        const selected = u.id === currentUser.id ? 'selected' : '';
-        html += `<option value="${u.id}" ${selected}>${u.name} (${u.role})</option>`;
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        if(authOverlay) authOverlay.style.display = 'none';
+        await dataApi.seedDatabase(); // Ensure initial data exists
+        const profile = await dataApi.fetchUserProfile(user.uid);
+        if (!profile) {
+            // Create default profile if signed up
+            await dataApi.addUser({
+                id: user.uid,
+                name: user.email.split('@')[0],
+                role: 'user',
+                avatar: user.email.substring(0, 2).toUpperCase(),
+                email: user.email,
+                phone: '',
+                otherInfo: '',
+                allowedInstruments: []
+            });
+            await dataApi.fetchUserProfile(user.uid);
+        }
+        init();
+    } else {
+        if(authOverlay) authOverlay.style.display = 'flex';
+    }
+});
+
+ else {
+        navAdmin.style.display = 'none';
+        if (state.currentView === 'admin-panel') {
+            state.currentView = 'dashboard';
+        }
+    }
+}
+
+
+" ${selected}>${u.name} (${u.role})</option>`;
     });
     userSwitcher.innerHTML = html;
 }
 
-function updateUserUI() {
-    const currentUser = dataApi.getCurrentUser();
-    currentUserAvatar.textContent = currentUser.avatar;
-    if (currentUser.role === 'admin') {
-        navAdmin.style.display = 'flex';
-    } else {
+ else {
         navAdmin.style.display = 'none';
         if (state.currentView === 'admin-panel') {
             state.currentView = 'dashboard';
@@ -93,7 +127,39 @@ function setupEventListeners() {
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
 
-    // Global Search
+    
+    if (authForm) {
+        authForm.addEventListener('submit', (e) => e.preventDefault());
+    }
+    if (btnLogin) {
+        btnLogin.addEventListener('click', async () => {
+            try {
+                authError.style.display = 'none';
+                await signInWithEmailAndPassword(auth, authEmail.value, authPassword.value);
+            } catch (err) {
+                authError.textContent = err.message;
+                authError.style.display = 'block';
+            }
+        });
+    }
+    if (btnSignup) {
+        btnSignup.addEventListener('click', async () => {
+            try {
+                authError.style.display = 'none';
+                await createUserWithEmailAndPassword(auth, authEmail.value, authPassword.value);
+            } catch (err) {
+                authError.textContent = err.message;
+                authError.style.display = 'block';
+            }
+        });
+    }
+    if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
+            signOut(auth);
+            window.location.reload();
+        });
+    }
+\n    // Global Search
     if (globalSearchInput) {
         globalSearchInput.addEventListener('input', (e) => {
             state.searchQuery = e.target.value.toLowerCase().trim();
@@ -102,7 +168,7 @@ function setupEventListeners() {
                 navItems.forEach(nav => nav.classList.remove('active'));
                 document.querySelector('[data-view="dashboard"]').classList.add('active');
             }
-            render();
+            await render();
         });
     }
 
@@ -116,17 +182,12 @@ function setupEventListeners() {
             if(state.currentView === 'dashboard') {
                 state.selectedInstrumentId = null;
             }
-            render();
+            await render();
         });
     });
 
     // User Switcher
-    userSwitcher.addEventListener('change', (e) => {
-        dataApi.switchUser(e.target.value);
-        updateUserUI();
-        populateInstrumentSelect();
-        render();
-    });
+    
 
     // View Container Submit Delegation (for dynamic forms like Admin Panel)
     viewContainer.addEventListener('submit', (e) => {
@@ -140,7 +201,7 @@ function setupEventListeners() {
             dataApi.addInstrument({ name, description: desc, channelPrefix: prefix, channelCount: count });
             alert('Instrument created successfully!');
             populateInstrumentSelect();
-            render();
+            await render();
         } else if (e.target.id === 'form-add-user') {
             e.preventDefault();
             const name = document.getElementById('new-user-name').value.trim();
@@ -153,7 +214,7 @@ function setupEventListeners() {
                 dataApi.addUser({ name, role, email, phone, otherInfo });
                 alert('User created successfully!');
                 populateUserSwitcher();
-                render();
+                await render();
             }
         } else if (e.target.id === 'form-user-permissions') {
             e.preventDefault();
@@ -165,7 +226,7 @@ function setupEventListeners() {
             });
             alert('Permissions saved successfully!');
             populateInstrumentSelect();
-            render();
+            await render();
         }
     });
 
@@ -176,7 +237,7 @@ function setupEventListeners() {
         if (btnEditUser) {
             e.preventDefault();
             const userId = btnEditUser.dataset.id;
-            const user = dataApi.getUsers().find(u => u.id === userId);
+            const users = await dataApi.getUsers();\n                const user = users.find(u => u.id === userId);
             if (user) {
                 document.getElementById('edit-user-id').value = user.id;
                 document.getElementById('edit-user-name').value = user.name;
@@ -196,7 +257,7 @@ function setupEventListeners() {
             if(confirm('Are you sure you want to delete this user? All their upcoming bookings will be removed.')) {
                 dataApi.deleteUser(btnDeleteUser.dataset.id);
                 populateUserSwitcher();
-                render();
+                await render();
             }
         }
 
@@ -235,7 +296,7 @@ function setupEventListeners() {
             if (confirm('Are you sure you want to delete this instrument? All associated bookings will be lost.')) {
                 dataApi.deleteInstrument(instId);
                 populateInstrumentSelect();
-                render();
+                await render();
             }
             return;
         }
@@ -247,8 +308,8 @@ function setupEventListeners() {
             e.stopPropagation();
             const bookingId = deleteBtn.dataset.id;
             if (confirm('Are you sure you want to cancel this booking?')) {
-                dataApi.deleteBooking(bookingId);
-                render();
+                await dataApi.deleteBooking(bookingId);
+                await render();
             }
             return;
         }
@@ -305,7 +366,7 @@ function setupEventListeners() {
         const scaleBtn = e.target.closest('.toggle-scale');
         if (scaleBtn) {
             state.timelineScale = parseInt(scaleBtn.dataset.scale);
-            render();
+            await render();
             return;
         }
 
@@ -315,7 +376,7 @@ function setupEventListeners() {
             state.selectedInstrumentId = card.dataset.id;
             state.currentView = 'calendar';
             navItems.forEach(nav => nav.classList.remove('active')); // clear active nav
-            render();
+            await render();
             return;
         }
 
@@ -325,7 +386,7 @@ function setupEventListeners() {
             state.currentView = 'dashboard';
             state.selectedInstrumentId = null;
             document.querySelector('[data-view="dashboard"]').classList.add('active');
-            render();
+            await render();
             return;
         }
 
@@ -347,12 +408,12 @@ function setupEventListeners() {
     btnNewBooking.addEventListener('click', () => openModal(null));
     closeBtns.forEach(btn => btn.addEventListener('click', closeModal));
 
-    btnModalDelete.addEventListener('click', () => {
+    btnModalDelete.addEventListener('click', async () => {
         const id = editingBookingIdInput.value;
         if (id && confirm('Are you sure you want to delete this reservation?')) {
             dataApi.deleteBooking(id);
             closeModal();
-            render();
+            await render();
         }
     });
 
@@ -382,7 +443,7 @@ function setupEventListeners() {
         if (updatedInst) {
             editInstModal.classList.add('hidden');
             populateInstrumentSelect();
-            render();
+            await render();
             alert('Instrument updated successfully!');
         }
     });
@@ -413,7 +474,7 @@ function setupEventListeners() {
                     updateUserUI();
                 }
                 
-                render();
+                await render();
                 alert('User updated successfully!');
             }
         }
@@ -429,19 +490,19 @@ function changeDate(days) {
     const dd = String(d.getDate()).padStart(2, '0');
     
     state.currentDate = `${yyyy}-${mm}-${dd}`;
-    render();
+    await render();
 }
 
 // Render loop
-function render() {
+async function render() {
     if (state.currentView === 'dashboard') {
-        viewContainer.innerHTML = renderDashboard(state.searchQuery);
+        viewContainer.innerHTML = await renderDashboard(state.searchQuery);
     } else if (state.currentView === 'calendar') {
-        viewContainer.innerHTML = renderCalendarView(state.selectedInstrumentId, state.currentDate, state.timelineScale);
+        viewContainer.innerHTML = await renderCalendarView(state.selectedInstrumentId, state.currentDate, state.timelineScale);
     } else if (state.currentView === 'my-bookings') {
-        viewContainer.innerHTML = renderMyBookings();
+        viewContainer.innerHTML = await renderMyBookings();
     } else if (state.currentView === 'admin-panel') {
-        viewContainer.innerHTML = renderAdminPanel();
+        viewContainer.innerHTML = await renderAdminPanel();
     } else {
         viewContainer.innerHTML = `<div class="dashboard-header"><h2>Work in Progress...</h2></div>`;
     }
@@ -534,8 +595,8 @@ function closeModal() {
     modal.classList.add('hidden');
 }
 
-function populateInstrumentSelect() {
-    const instruments = dataApi.getInstruments();
+async function populateInstrumentSelect() {
+    const instruments = await dataApi.getInstruments();
     let html = '<option value="" disabled selected>Select Instrument</option>';
     instruments.forEach(inst => {
         html += `<option value="${inst.id}">${inst.name}</option>`;
@@ -625,7 +686,7 @@ function handleBookingSubmit() {
 
     closeModal();
     // Re-render
-    render();
+    await render();
 }
 
 function updateCurrentTimeLine() {
@@ -704,7 +765,7 @@ function handleMouseMove(e) {
     }
 }
 
-function handleMouseUp(e) {
+async function handleMouseUp(e) {
     if (!dragState) return;
     
     const deltaX = e.clientX - dragState.initialX;
@@ -736,11 +797,11 @@ function handleMouseUp(e) {
     
     // Only update if it actually moved meaningfully
     if (wasDragged) {
-        dataApi.updateBooking(dragState.bookingId, {
+        await dataApi.updateBooking(dragState.bookingId, {
             startDate: newStart.toISOString(),
             endDate: newEnd.toISOString()
         });
-        render(); // Re-render to snap to grid correctly
+        await render(); // Re-render to snap to grid correctly
     } else {
         // If not dragged, reset visual styles
         dragState.element.style.left = `${dragState.initialLeftPx}px`;
@@ -754,5 +815,4 @@ function handleMouseUp(e) {
     setTimeout(() => { wasDragged = false; }, 0);
 }
 
-// Start App
-init();
+// Start App handled by Auth Listener

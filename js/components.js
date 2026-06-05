@@ -1,9 +1,13 @@
 // js/components.js
 import { dataApi, currentUser } from './data.js';
 
-export function renderAdminPanel() {
-    const users = dataApi.getUsers();
-    const instruments = dataApi.getAllInstruments();
+export async function renderAdminPanel() {
+    const users = await dataApi.getUsers();
+    const instruments = await dataApi.getAllInstruments();
+    const user = await dataApi.getCurrentUser();
+
+    // Only admins can see this
+    if (user.role !== 'admin') return '<div class="view-container"><h2>Access Denied</h2></div>';
 
     // Generate Users List
     let usersListHtml = users.map(u => `
@@ -17,7 +21,7 @@ export function renderAdminPanel() {
             </div>
             <div style="display: flex; gap: 4px;">
                 <button class="icon-btn btn-edit-user" data-id="${u.id}" style="color: var(--primary-color); border: 1px solid var(--glass-border); padding: 4px;" title="Edit User"><i class="ri-pencil-line"></i></button>
-                ${u.id !== currentUser.id ? `<button class="icon-btn btn-delete-user" data-id="${u.id}" style="color: var(--danger, #ef4444); border: 1px solid var(--glass-border); padding: 4px;" title="Delete User"><i class="ri-delete-bin-line"></i></button>` : ''}
+                ${u.id !== user.id ? `<button class="icon-btn btn-delete-user" data-id="${u.id}" style="color: var(--danger, #ef4444); border: 1px solid var(--glass-border); padding: 4px;" title="Delete User"><i class="ri-delete-bin-line"></i></button>` : ''}
             </div>
         </div>
     `).join('');
@@ -178,8 +182,8 @@ export function renderAdminPanel() {
 }
 
 
-export function renderMyBookings() {
-    const myBookings = dataApi.getMyBookings();
+export async function renderMyBookings() {
+    const myBookings = await dataApi.getMyBookings();
     
     let html = `
         <div class="dashboard-header">
@@ -248,8 +252,8 @@ export function renderMyBookings() {
 }
 
 
-export function renderDashboard(searchQuery = '') {
-    let instruments = dataApi.getInstruments();
+export async function renderDashboard(searchQuery = '') {
+    let instruments = await dataApi.getInstruments();
     
     if (searchQuery) {
         instruments = instruments.filter(inst => {
@@ -303,11 +307,11 @@ export function renderDashboard(searchQuery = '') {
     return html;
 }
 
-export function renderCalendarView(instrumentId, dateStr, daysToRender = 30) {
-    const instrument = dataApi.getInstrumentById(instrumentId);
+export async function renderCalendarView(instrumentId, dateStr, daysToRender = 30) {
+    const instrument = await dataApi.getInstrumentById(instrumentId);
     if (!instrument) return `<p>Instrument not found.</p>`;
 
-    const bookings = dataApi.getBookingsByInstrument(instrumentId);
+    const bookings = await dataApi.getBookingsByInstrument(instrumentId);
     // Append T00:00:00 to force parsing as Local Time instead of UTC
     const localDateStr = dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`;
     const startDate = new Date(localDateStr);

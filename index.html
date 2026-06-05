@@ -36,10 +36,14 @@
             </nav>
             <div class="user-profile">
                 <div class="avatar" id="current-user-avatar">JS</div>
-                <div class="user-info">
-                    <select id="user-switcher" class="form-control" style="padding: 2px 4px; font-size: 0.85rem; background: var(--bg-surface-elevated); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); color: var(--text-primary); width: 100%;">
-                        <!-- Options populated by JS -->
-                    </select>
+                <div class="user-info" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div>
+                        <div class="name" id="current-user-name">Loading...</div>
+                        <div class="role" id="current-user-role">User</div>
+                    </div>
+                    <button class="icon-btn" id="btn-logout" title="Log Out" style="color: var(--danger);">
+                        <i class="ri-logout-box-r-line"></i>
+                    </button>
                 </div>
             </div>
         </aside>
@@ -212,6 +216,35 @@
     <!-- Scripts -->
     <script type="module" src="js/data.js?v=3"></script>
     <script type="module" src="js/components.js?v=3"></script>
-    <script type="module" src="js/app.js?v=3"></script>
+
+    <!-- Auth Overlay -->
+    <div class="modal-overlay" id="auth-overlay" style="display: flex; background: var(--bg-base); z-index: 9999;">
+        <div class="modal-content" style="max-width: 400px; width: 100%; text-align: center;">
+            <div class="logo" style="justify-content: center; margin-bottom: var(--spacing-xl);">
+                <img src="images/logo.png" alt="SciBooker Logo" style="height: 60px; object-fit: contain;">
+            </div>
+            <h2>Welcome to SciBooker</h2>
+            <p style="color: var(--text-muted); margin-bottom: var(--spacing-lg);">Please sign in to continue</p>
+            
+            <form id="auth-form" style="text-align: left;">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="auth-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="auth-password" class="form-control" required>
+                </div>
+                <div id="auth-error" style="color: var(--danger); font-size: 0.85rem; margin-bottom: var(--spacing-md); display: none;"></div>
+                
+                <div style="display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-xl);">
+                    <button type="submit" class="btn-primary" id="btn-login" style="flex: 1;">Log In</button>
+                    <button type="button" class="btn-secondary" id="btn-signup" style="flex: 1;">Sign Up</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js?v=4"></script>
 </body>
 </html>
