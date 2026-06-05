@@ -1,4 +1,4 @@
-import { db, auth } from './firebase.js?v=18';
+import { db, auth } from './firebase.js?v=19';
 import { 
     collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, writeBatch 
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -78,6 +78,12 @@ export const dataApi = {
     async getInstrumentById(id) {
         const d = await getDoc(doc(db, 'instruments', id));
         return d.exists() ? { id: d.id, ...d.data() } : null;
+    },
+    async addInstrument(instData) {
+        const id = `inst_${Date.now()}`;
+        const newInst = { id, ...instData };
+        await setDoc(doc(db, 'instruments', id), newInst);
+        return newInst;
     },
     async updateInstrument(id, updatedData) {
         // If channels changed, it's more complex, but we'll do a simple replace
