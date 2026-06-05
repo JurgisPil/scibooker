@@ -83,6 +83,10 @@ async function updateUserUI() {
                 }
             }
         }
+    } else {
+        const nameEl = document.getElementById('current-user-name');
+        if (nameEl) nameEl.textContent = "USER IS NULL!";
+        alert("CRITICAL DEBUG: user is null inside updateUserUI!");
     }
 }
 

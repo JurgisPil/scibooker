@@ -18,6 +18,7 @@ export const dataApi = {
             return null;
         } catch (e) {
             console.error("Error fetching user profile:", e);
+            alert("HIDDEN ERROR IN FETCH PROFILE: " + e.message);
             return null;
         }
     },
