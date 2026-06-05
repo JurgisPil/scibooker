@@ -119,9 +119,7 @@ onAuthStateChanged(auth, async (user) => {
             }
 
             if(authOverlay) authOverlay.style.display = 'none';
-            alert('Trace 3: overlay hidden, about to seedDatabase');
-            await dataApi.seedDatabase(); // Ensure initial data exists
-            alert('Trace 4: seedDatabase done, about to fetchUserProfile');
+            // Removed seedDatabase call as it is hanging and DB is already seeded
             let profile = await dataApi.fetchUserProfile(user.uid);
             alert('Trace 5: fetchUserProfile done. profile is ' + (profile ? 'truthy' : 'null'));
             if (!profile) {
