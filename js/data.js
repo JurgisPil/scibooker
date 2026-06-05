@@ -1,4 +1,4 @@
-import { db, auth } from './firebase.js?v=19';
+import { db, auth } from './firebase.js?v=20';
 import { 
     collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, writeBatch 
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -81,7 +81,25 @@ export const dataApi = {
     },
     async addInstrument(instData) {
         const id = `inst_${Date.now()}`;
-        const newInst = { id, ...instData };
+        const channels = [];
+        const count = parseInt(instData.channelCount) || 1;
+        const prefix = instData.channelPrefix || 'ch-';
+        
+        for(let i=0; i<count; i++) {
+            channels.push({
+                id: `${prefix}${i + 1}_${Date.now()}`,
+                name: `${prefix}${i + 1}`,
+                color: `var(--channel-${(i % 4) + 1})`
+            });
+        }
+        
+        const newInst = { 
+            id, 
+            name: instData.name, 
+            description: instData.description || '', 
+            status: 'active', 
+            channels 
+        };
         await setDoc(doc(db, 'instruments', id), newInst);
         return newInst;
     },
