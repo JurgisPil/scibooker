@@ -61,8 +61,7 @@ async function init() {
     state.currentDate = new Date().toISOString().split('T')[0];
     await populateInstrumentSelect();
     updateUserUI();
-    setupEventListeners();
-    await await render();
+    await render();
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -816,3 +815,4 @@ async function handleMouseUp(e) {
 }
 
 // Start App handled by Auth Listener
+setupEventListeners();
