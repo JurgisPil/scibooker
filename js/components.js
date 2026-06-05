@@ -1,5 +1,5 @@
 // js/components.js
-import { dataApi, currentUser } from './data.js';
+import { dataApi } from './data.js';
 
 export async function renderAdminPanel() {
     const users = await dataApi.getUsers();
@@ -383,7 +383,7 @@ export async function renderCalendarView(instrumentId, dateStr, daysToRender = 3
             const leftPx = exactStartDiffDays * cellWidthPxPerDay;
             const widthPx = exactDurationDays * cellWidthPxPerDay;
 
-            const isMine = booking.userId === currentUser.id;
+            const isMine = booking.userId === dataApi.getCurrentUser()?.id;
             const myClass = isMine ? 'my-booking' : '';
             const bg = isMine ? 'var(--primary-color)' : 'var(--bg-surface-elevated)';
             const color = isMine ? 'white' : 'var(--text-primary)';
