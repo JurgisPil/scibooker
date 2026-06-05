@@ -151,7 +151,7 @@ function setupEventListeners() {
             window.location.reload();
         });
     }
-\n    // Global Search
+    // Global Search
     if (globalSearchInput) {
         globalSearchInput.addEventListener('input', (e) => {
             state.searchQuery = e.target.value.toLowerCase().trim();
@@ -229,7 +229,8 @@ function setupEventListeners() {
         if (btnEditUser) {
             e.preventDefault();
             const userId = btnEditUser.dataset.id;
-            const users = await dataApi.getUsers();\n                const user = users.find(u => u.id === userId);
+            const users = await dataApi.getUsers();
+            const user = users.find(u => u.id === userId);
             if (user) {
                 document.getElementById('edit-user-id').value = user.id;
                 document.getElementById('edit-user-name').value = user.name;
