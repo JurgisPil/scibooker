@@ -91,16 +91,27 @@ async function updateUserUI() {
 }
 
 async function init() {
-    state.currentDate = new Date().toISOString().split('T')[0];
-    await populateInstrumentSelect();
-    await updateUserUI();
-    await render();
+    alert('Trace 8: inside init()');
+    try {
+        state.currentDate = new Date().toISOString().split('T')[0];
+        alert('Trace 9: before populateInstrumentSelect()');
+        await populateInstrumentSelect();
+        alert('Trace 10: after populateInstrumentSelect(), before updateUserUI()');
+        await updateUserUI();
+        alert('Trace 11: after updateUserUI(), before render()');
+        await render();
+        alert('Trace 12: render() done.');
+    } catch (e) {
+        alert("CRASH IN INIT: " + e.message);
+    }
 }
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         try {
+            alert('Trace 1: user is defined. ' + user.email);
             const isAllowed = await dataApi.isEmailAllowed(user.email);
+            alert('Trace 2: isAllowed = ' + isAllowed);
             if (!isAllowed) {
                 alert('Access Denied: Your email is not on the admin allowlist.');
                 await signOut(auth);
@@ -108,9 +119,13 @@ onAuthStateChanged(auth, async (user) => {
             }
 
             if(authOverlay) authOverlay.style.display = 'none';
+            alert('Trace 3: overlay hidden, about to seedDatabase');
             await dataApi.seedDatabase(); // Ensure initial data exists
+            alert('Trace 4: seedDatabase done, about to fetchUserProfile');
             let profile = await dataApi.fetchUserProfile(user.uid);
+            alert('Trace 5: fetchUserProfile done. profile is ' + (profile ? 'truthy' : 'null'));
             if (!profile) {
+                alert('Trace 6: no profile, adding user');
                 await dataApi.addUser({
                     id: user.uid,
                     name: user.displayName || user.email.split('@')[0],
@@ -127,8 +142,10 @@ onAuthStateChanged(auth, async (user) => {
                 await dataApi.updateUser(user.uid, { role: 'admin' });
                 profile = await dataApi.fetchUserProfile(user.uid);
             }
+            alert('Trace 7: about to call init()');
             init();
         } catch (error) {
+            alert('CRASH IN AUTH: ' + error.message);
             document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:99999;padding:20px;font-size:20px;">CRASH IN AUTH: ' + error.message + '</div>';
         }
     } else {
