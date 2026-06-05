@@ -34,7 +34,7 @@ export const dataApi = {
     },
     async addUser(userData) {
         // Typically handled by Auth, but if admin adds a user profile manually:
-        const userId = `u_${Date.now()}`;
+        const userId = userData.id || `u_${Date.now()}`;
         await setDoc(doc(db, 'users', userId), userData);
         return { id: userId, ...userData };
     },
