@@ -68,20 +68,24 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
         if(authOverlay) authOverlay.style.display = 'none';
         await dataApi.seedDatabase(); // Ensure initial data exists
-        const profile = await dataApi.fetchUserProfile(user.uid);
+        let profile = await dataApi.fetchUserProfile(user.uid);
         if (!profile) {
             // Create default profile if signed up
             await dataApi.addUser({
                 id: user.uid,
                 name: user.email.split('@')[0],
-                role: 'user',
+                role: user.email === 'j.pilipavicius@gmail.com' ? 'admin' : 'user',
                 avatar: user.email.substring(0, 2).toUpperCase(),
                 email: user.email,
                 phone: '',
                 otherInfo: '',
                 allowedInstruments: []
             });
-            await dataApi.fetchUserProfile(user.uid);
+            profile = await dataApi.fetchUserProfile(user.uid);
+        } else if (profile.email === 'j.pilipavicius@gmail.com' && profile.role !== 'admin') {
+            // Auto-promote existing account
+            await dataApi.updateUser(user.uid, { role: 'admin' });
+            profile = await dataApi.fetchUserProfile(user.uid);
         }
         init();
     } else {
