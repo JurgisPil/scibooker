@@ -182,7 +182,7 @@ function setupEventListeners() {
     
 
     // View Container Submit Delegation (for dynamic forms like Admin Panel)
-    viewContainer.addEventListener('submit', (e) => {
+    viewContainer.addEventListener('submit', async (e) => {
         if (e.target.id === 'form-add-instrument') {
             e.preventDefault();
             const name = document.getElementById('new-inst-name').value.trim();
@@ -223,7 +223,7 @@ function setupEventListeners() {
     });
 
     // View Container Click Delegation (for dynamically rendered content)
-    viewContainer.addEventListener('click', (e) => {
+    viewContainer.addEventListener('click', async (e) => {
         // Edit User (Admin Panel)
         const btnEditUser = e.target.closest('.btn-edit-user');
         if (btnEditUser) {
@@ -474,7 +474,7 @@ function setupEventListeners() {
     });
 }
 
-function changeDate(days) {
+async function changeDate(days) {
     const d = new Date(state.currentDate);
     d.setDate(d.getDate() + days);
     
@@ -609,7 +609,7 @@ function populateChannelSelect(instrumentId) {
     channelCheckboxGroup.innerHTML = html;
 }
 
-function handleBookingSubmit() {
+async function handleBookingSubmit() {
     const instrumentId = instrumentSelect.value;
     
     // Gather all checked channels
