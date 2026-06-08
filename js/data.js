@@ -1,4 +1,4 @@
-import { db, auth } from './firebase.js?v=37';
+import { db, auth } from './firebase.js?v=38';
 import { 
     collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, writeBatch 
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -6,8 +6,8 @@ import {
 // Cached current user profile from Firestore
 export let currentUserProfile = null;
 
-import { isMockMode } from './firebase.js?v=37';
-import { MockDataApi } from './mockDataApi.js?v=37';
+import { isMockMode } from './firebase.js?v=38';
+import { MockDataApi } from './mockDataApi.js?v=38';
 
 const RealDataApi = {
     // ---- AUTH / INIT ----

@@ -1,7 +1,7 @@
-import { dataApi } from './data.js?v=37';
-import { auth, googleProvider, isMockMode } from './firebase.js?v=37';
+import { dataApi } from './data.js?v=38';
+import { auth, googleProvider, isMockMode } from './firebase.js?v=38';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
-import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=37';
+import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=38';
 
 window.addEventListener('error', function(e) {
     document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:99999;padding:20px;font-size:20px;">ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '</div>';
@@ -103,7 +103,7 @@ async function init() {
 
 if (isMockMode) {
     if(authOverlay) authOverlay.style.display = 'none';
-    document.body.innerHTML += '<div style="position:fixed;top:10px;left:50%;transform:translateX(-50%);background:var(--danger,#ef4444);color:white;padding:5px 15px;border-radius:20px;font-weight:bold;z-index:10000;pointer-events:none;box-shadow:0 2px 10px rgba(0,0,0,0.3);">DEMO MODE</div>';
+    document.body.insertAdjacentHTML('beforeend', '<div style="position:fixed;top:10px;left:50%;transform:translateX(-50%);background:var(--danger,#ef4444);color:white;padding:5px 15px;border-radius:20px;font-weight:bold;z-index:10000;pointer-events:none;box-shadow:0 2px 10px rgba(0,0,0,0.3);">DEMO MODE</div>');
     init();
 } else {
     onAuthStateChanged(auth, async (user) => {
