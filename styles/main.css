@@ -322,23 +322,4 @@ a:hover {
         height: 32px;
         font-size: 0.8rem;
     }
-
-    /* Enable native body scrolling on mobile */
-    html, body {
-        height: auto;
-        overflow: visible;
-    }
-
-    .app-container {
-        height: auto;
-        min-height: 100vh;
-    }
-
-    .main-content {
-        overflow: visible;
-    }
-
-    .view-container {
-        overflow: visible !important;
-    }
 }
