@@ -1,4 +1,4 @@
-import { dataApi } from './data.js?v=30';
+import { dataApi } from './data.js?v=31';
 
 export async function renderAdminPanel() {
     const users = await dataApi.getUsers();
@@ -239,6 +239,13 @@ export async function renderMyBookings() {
 
 export async function renderDashboard(searchQuery = '') {
     let instruments = await dataApi.getInstruments();
+    const currentUser = dataApi.getCurrentUser();
+    
+    // Filter out instruments the user has no permissions for
+    if (currentUser && currentUser.role !== 'admin') {
+        const allowedIds = currentUser.permissions || [];
+        instruments = instruments.filter(inst => allowedIds.includes(inst.id));
+    }
     
     if (searchQuery) {
         instruments = instruments.filter(inst => {

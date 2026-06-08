@@ -1,4 +1,4 @@
-import { db, auth } from './firebase.js?v=30';
+import { db, auth } from './firebase.js?v=31';
 import { 
     collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, writeBatch 
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -24,6 +24,9 @@ export const dataApi = {
     
     getCurrentUser() {
         return currentUserProfile;
+    },
+    setCurrentUser(profile) {
+        currentUserProfile = profile;
     },
 
     // ---- ALLOWLIST ----

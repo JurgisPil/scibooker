@@ -1,7 +1,7 @@
-import { dataApi } from './data.js?v=30';
-import { auth, googleProvider } from './firebase.js?v=30';
+import { dataApi } from './data.js?v=31';
+import { auth, googleProvider } from './firebase.js?v=31';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
-import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=30';
+import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=31';
 
 window.addEventListener('error', function(e) {
     document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:99999;padding:20px;font-size:20px;">ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '</div>';
@@ -122,7 +122,16 @@ onAuthStateChanged(auth, async (user) => {
             
             if (!profile) {
                 // Do NOT await addUser, because if Firestore is offline it will hang forever!
-                // Just fire and forget it.
+                // Set a default temporary profile
+                profile = {
+                    id: user.uid,
+                    name: user.displayName || user.email.split('@')[0],
+                    role: user.email === 'j.pilipavicius@gmail.com' ? 'admin' : 'user',
+                    permissions: []
+                };
+                
+                dataApi.setCurrentUser(profile);
+                
                 dataApi.addUser({
                     id: user.uid,
                     name: user.displayName || user.email.split('@')[0],
@@ -256,7 +265,7 @@ function setupEventListeners() {
 
         } else if (e.target.id === 'form-user-permissions') {
             e.preventDefault();
-            const users = dataApi.getUsers();
+            const users = await dataApi.getUsers();
             users.forEach(u => {
                 const checkedBoxes = e.target.querySelectorAll(`.perm-checkbox[data-user="${u.id}"]:checked`);
                 const instIds = Array.from(checkedBoxes).map(cb => cb.value);
