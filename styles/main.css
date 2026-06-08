@@ -336,5 +336,17 @@ a:hover {
     }
     .view-container {
         padding: 5px !important;
+        overflow: visible !important;
+    }
+    html, body {
+        height: auto !important;
+        overflow: visible !important;
+    }
+    .app-container {
+        height: auto !important;
+        min-height: 100dvh;
+    }
+    .main-content {
+        overflow: visible !important;
     }
 }
