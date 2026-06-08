@@ -268,8 +268,8 @@ a:hover {
     -webkit-text-fill-color: transparent;
 }
 
-/* Mobile Responsive Layout */
-@media (max-width: 768px) {
+/* Mobile & Tablet Responsive Layout */
+@media (max-width: 1024px), (max-height: 500px) {
     .app-container {
         flex-direction: column;
     }
