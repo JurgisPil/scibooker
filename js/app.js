@@ -131,7 +131,7 @@ if (isMockMode) {
                 profile = {
                     id: user.uid,
                     name: user.displayName || user.email.split('@')[0],
-                    role: user.email === 'j.pilipavicius@gmail.com' ? 'admin' : 'user',
+                    role: 'user',
                     allowedInstruments: []
                 };
                 
@@ -140,7 +140,7 @@ if (isMockMode) {
                 dataApi.addUser({
                     id: user.uid,
                     name: user.displayName || user.email.split('@')[0],
-                    role: user.email === 'j.pilipavicius@gmail.com' ? 'admin' : 'user',
+                    role: 'user',
                     avatar: user.photoURL ? null : user.email.substring(0, 2).toUpperCase(),
                     photoURL: user.photoURL || null,
                     email: user.email,
@@ -153,15 +153,11 @@ if (isMockMode) {
                 profile = {
                     id: user.uid,
                     name: user.displayName || user.email.split('@')[0],
-                    role: user.email === 'j.pilipavicius@gmail.com' ? 'admin' : 'user',
+                    role: 'user',
                     avatar: user.photoURL ? null : user.email.substring(0, 2).toUpperCase()
                 };
                 
                 // Hack: force the dataApi to return our mock profile 
-                dataApi.getCurrentUser = async () => profile;
-            } else if (profile.email === 'j.pilipavicius@gmail.com' && profile.role !== 'admin') {
-                dataApi.updateUser(user.uid, { role: 'admin' }).catch(e => {});
-                profile.role = 'admin';
                 dataApi.getCurrentUser = async () => profile;
             }
             
