@@ -1,7 +1,7 @@
-import { dataApi } from './data.js?v=24';
-import { auth, googleProvider } from './firebase.js?v=24';
+import { dataApi } from './data.js?v=25';
+import { auth, googleProvider } from './firebase.js?v=25';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
-import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=24';
+import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=25';
 
 window.addEventListener('error', function(e) {
     document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:99999;padding:20px;font-size:20px;">ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '</div>';
@@ -586,7 +586,7 @@ function openModal(bookingId = null, prefillChannelId = null, prefillStartDate =
     
     if (bookingId) {
         // Edit Mode
-        const booking = dataApi.getBookingById(bookingId);
+        const booking = await dataApi.getBookingById(bookingId);
         if (!booking) return;
 
         modalTitle.textContent = 'Edit Booking';
@@ -602,7 +602,7 @@ function openModal(bookingId = null, prefillChannelId = null, prefillStartDate =
         document.getElementById('booking-end-time').value = eDate.toTimeString().substring(0,5);
         document.getElementById('booking-purpose').value = booking.purpose;
 
-        const inst = dataApi.getInstrumentById(booking.instrumentId);
+        const inst = await dataApi.getInstrumentById(booking.instrumentId);
         document.getElementById('instrument-display').textContent = inst ? inst.name : 'Unknown Instrument';
         document.getElementById('instrument-display').style.display = 'block';
         instrumentSelect.style.display = 'none';
@@ -876,7 +876,7 @@ async function handleMouseUp(e) {
     document.body.style.cursor = 'default';
     
     // Prevent immediate click event after dropping
-    setTimeout(() => { wasDragged = false; }, 0);
+    setTimeout(() => { wasDragged = false; }, 100);
     
     // Only update if it actually moved meaningfully
     if (isDragged) {
