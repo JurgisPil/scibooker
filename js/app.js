@@ -326,7 +326,6 @@ function setupEventListeners() {
             e.preventDefault();
             if(confirm('Are you sure you want to delete this user? All their upcoming bookings will be removed.')) {
                 dataApi.deleteUser(btnDeleteUser.dataset.id);
-                populateUserSwitcher();
                 await render();
             }
         }
@@ -544,7 +543,6 @@ function setupEventListeners() {
             const updatedUser = dataApi.updateUser(id, { name, role, email, phone, otherInfo });
             if (updatedUser) {
                 editUserModal.classList.add('hidden');
-                populateUserSwitcher();
                 
                 // Update current user UI if they edited themselves
                 const currentUser = await dataApi.getCurrentUser();
