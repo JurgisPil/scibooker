@@ -1,7 +1,7 @@
-import { dataApi } from './data.js?v=34';
-import { auth, googleProvider } from './firebase.js?v=34';
+import { dataApi } from './data.js?v=35';
+import { auth, googleProvider } from './firebase.js?v=35';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
-import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=34';
+import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=35';
 
 window.addEventListener('error', function(e) {
     document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:99999;padding:20px;font-size:20px;">ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '</div>';
@@ -419,7 +419,15 @@ function setupEventListeners() {
             const msIn30Mins = 30 * 60 * 1000;
             const roundedTime = Math.round(clickDate.getTime() / msIn30Mins) * msIn30Mins;
             const finalStart = new Date(roundedTime);
-            const finalEnd = new Date(finalStart.getTime() + (24 * 60 * 60 * 1000));
+            let durationMs = 24 * 60 * 60 * 1000; // default 1 day
+            if (state.timelineScale === 1) {
+                durationMs = 1 * 60 * 60 * 1000; // 1 hour
+            } else if (state.timelineScale === 7) {
+                durationMs = 24 * 60 * 60 * 1000; // 1 day
+            } else if (state.timelineScale === 30) {
+                durationMs = 7 * 24 * 60 * 60 * 1000; // 1 week
+            }
+            const finalEnd = new Date(finalStart.getTime() + durationMs);
             
             const channelId = ganttRowBg.dataset.channelId;
             openModal(null, channelId, finalStart, finalEnd);
@@ -632,11 +640,9 @@ async function openModal(bookingId = null, prefillChannelId = null, prefillStart
             document.getElementById('booking-start-date').value = state.currentDate;
             document.getElementById('booking-start-time').value = '09:00';
             
-            // Default end date is 7 days from now
-            const endDate = new Date(state.currentDate);
-            endDate.setDate(endDate.getDate() + 7);
-            document.getElementById('booking-end-date').value = endDate.toISOString().split('T')[0];
-            document.getElementById('booking-end-time').value = '17:00';
+            // Default duration is 1 hour
+            document.getElementById('booking-end-date').value = state.currentDate;
+            document.getElementById('booking-end-time').value = '10:00';
         }
         
         if (state.selectedInstrumentId) {
