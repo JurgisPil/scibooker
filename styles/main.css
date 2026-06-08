@@ -334,7 +334,7 @@ a:hover {
     .nav-item {
         padding: 2px 8px !important;
     }
-    .main-content {
-        padding: 10px !important;
+    .view-container {
+        padding: 5px !important;
     }
 }
