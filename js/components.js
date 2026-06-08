@@ -242,7 +242,7 @@ export async function renderDashboard(searchQuery = '') {
     const currentUser = dataApi.getCurrentUser();
     
     // Filter out instruments the user has no permissions for
-    if (currentUser && currentUser.role !== 'admin') {
+    if (currentUser) {
         const allowedIds = currentUser.allowedInstruments || [];
         instruments = instruments.filter(inst => allowedIds.includes(inst.id));
     }
