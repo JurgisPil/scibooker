@@ -1,7 +1,7 @@
-import { dataApi } from './data.js?v=23';
-import { auth, googleProvider } from './firebase.js?v=23';
+import { dataApi } from './data.js?v=24';
+import { auth, googleProvider } from './firebase.js?v=24';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
-import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=23';
+import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=24';
 
 window.addEventListener('error', function(e) {
     document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:99999;padding:20px;font-size:20px;">ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '</div>';
@@ -867,24 +867,34 @@ async function handleMouseUp(e) {
     newStart = new Date(Math.round(newStart.getTime() / msIn30Mins) * msIn30Mins);
     newEnd = new Date(Math.round(newEnd.getTime() / msIn30Mins) * msIn30Mins);
     
-    // Only update if it actually moved meaningfully
-    if (wasDragged) {
-        await dataApi.updateBooking(dragState.bookingId, {
-            startDate: newStart.toISOString(),
-            endDate: newEnd.toISOString()
-        });
-        await render(); // Re-render to snap to grid correctly
-    } else {
-        // If not dragged, reset visual styles
-        dragState.element.style.left = `${dragState.initialLeftPx}px`;
-        dragState.element.style.width = `${dragState.initialWidthPx}px`;
-    }
+    const currentDragState = dragState;
+    const bookingId = currentDragState.bookingId;
+    const isDragged = wasDragged;
     
+    // Detach immediately so it doesn't follow the mouse while saving
     dragState = null;
     document.body.style.cursor = 'default';
     
     // Prevent immediate click event after dropping
     setTimeout(() => { wasDragged = false; }, 0);
+    
+    // Only update if it actually moved meaningfully
+    if (isDragged) {
+        try {
+            await dataApi.updateBooking(bookingId, {
+                startDate: newStart.toISOString(),
+                endDate: newEnd.toISOString()
+            });
+            await render(); // Re-render to snap to grid correctly
+        } catch (e) {
+            console.error("Failed to update booking on drag", e);
+            await render(); // Re-render to reset if failed
+        }
+    } else {
+        // If not dragged, reset visual styles
+        currentDragState.element.style.left = `${currentDragState.initialLeftPx}px`;
+        currentDragState.element.style.width = `${currentDragState.initialWidthPx}px`;
+    }
 }
 
 // Start App handled by Auth Listener
