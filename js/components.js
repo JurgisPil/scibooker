@@ -1,4 +1,4 @@
-import { dataApi } from './data.js?v=29';
+import { dataApi } from './data.js?v=30';
 
 export async function renderAdminPanel() {
     const users = await dataApi.getUsers();
@@ -132,41 +132,7 @@ export async function renderAdminPanel() {
                         </div>
                     </div>
 
-                    <div class="card">
-                        <h4 style="margin-bottom: var(--spacing-md);">Add New User</h4>
-                        <form id="form-add-user" style="display: flex; flex-direction: column; gap: var(--spacing-md);">
-                            <div style="display: flex; gap: var(--spacing-md);">
-                                <div class="form-group" style="flex: 2; margin-bottom: 0;">
-                                    <label>User Name</label>
-                                    <input type="text" id="new-user-name" required placeholder="e.g. Alice Smith">
-                                </div>
-                                <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                                    <label>Role</label>
-                                    <select id="new-user-role" required>
-                                        <option value="user">User</option>
-                                        <option value="admin">Admin</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: var(--spacing-md);">
-                                <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                                    <label>Email</label>
-                                    <input type="email" id="new-user-email" placeholder="Optional">
-                                </div>
-                                <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                                    <label>Phone</label>
-                                    <input type="text" id="new-user-phone" placeholder="Optional">
-                                </div>
-                            </div>
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label>Other Info</label>
-                                <input type="text" id="new-user-other" placeholder="Optional details">
-                            </div>
-                            <div style="text-align: right;">
-                                <button type="submit" class="btn-primary">Create User</button>
-                            </div>
-                        </form>
-                    </div>
+
                 </div>
 
                 <div class="card" style="overflow-x: auto; margin-top: var(--spacing-lg);">
