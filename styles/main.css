@@ -265,3 +265,61 @@ a:hover {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+
+/* Mobile Responsive Layout */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: 60px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 var(--spacing-sm);
+        border-right: none;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .logo {
+        display: none;
+    }
+
+    .nav-menu {
+        flex-direction: row;
+        width: auto;
+        padding: 0;
+        justify-content: center;
+        flex: 1;
+        gap: var(--spacing-sm);
+    }
+
+    .nav-item {
+        font-size: 0;
+        padding: var(--spacing-sm);
+        margin: 0;
+    }
+
+    .nav-item i {
+        font-size: 1.5rem;
+    }
+
+    .user-profile {
+        padding: 0;
+        border: none;
+        flex-direction: row;
+        margin-top: 0;
+    }
+
+    .user-info {
+        display: none !important;
+    }
+    
+    .avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+}
