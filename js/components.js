@@ -412,7 +412,7 @@ export async function renderCalendarView(instrumentId, dateStr, daysToRender = 3
     let html = `
         <div class="gantt-view">
             <div class="gantt-header-controls" style="justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                <div style="display: flex; align-items: center; gap: var(--spacing-md); flex-wrap: wrap;">
                     <button class="icon-btn" id="btn-back"><i class="ri-arrow-left-line"></i></button>
                     <h2>${instrument.name}</h2>
                     <div class="date-navigation">
