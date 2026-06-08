@@ -1,8 +1,8 @@
 export class MockDataApi {
     constructor() {
         this.users = [
-            { id: "mock_admin_1", uid: "mock_admin_1", email: "admin@scibooker.demo", name: "Demo Admin", avatar: "DA", role: "admin", allowedInstruments: [] },
-            { id: "mock_user_1", uid: "mock_user_1", email: "user@scibooker.demo", name: "Demo User", avatar: "DU", role: "user", allowedInstruments: ["inst_1"] }
+            { id: "mock_admin_1", uid: "mock_admin_1", email: "admin@scibooker.demo", name: "Demo Admin", avatar: "DA", role: "admin", allowedInstruments: ["inst_1", "inst_2"] },
+            { id: "mock_user_1", uid: "mock_user_1", email: "user@scibooker.demo", name: "Demo User", avatar: "DU", role: "user", allowedInstruments: ["inst_1", "inst_2"] }
         ];
         
         this.instruments = [
