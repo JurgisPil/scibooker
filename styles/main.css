@@ -325,3 +325,16 @@ a:hover {
         font-size: 0.8rem;
     }
 }
+
+/* Landscape Mobile Height Optimizations */
+@media (max-height: 500px) and (orientation: landscape) {
+    .sidebar {
+        padding: 2px !important;
+    }
+    .nav-item {
+        padding: 2px 8px !important;
+    }
+    .main-content {
+        padding: 10px !important;
+    }
+}
