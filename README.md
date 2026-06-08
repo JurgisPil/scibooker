@@ -91,4 +91,6 @@ Since the app requires an Admin to manage settings, you must manually elevate yo
 
 SciBooker features a built-in mock mode designed for showcasing the UI without needing a real database. 
 
+**[👉 Try the Live Demo Here!](https://jurgispil.github.io/scibooker/)**
+
 If the app is accessed via a URL containing `github.io` (e.g. GitHub Pages), it automatically bypasses Firebase. It logs you in as a Mock User and populates the UI with dummy data. A floating **"Switch to User/Admin View"** button will appear in the bottom corner so visitors can safely test out the permissions of both roles.
