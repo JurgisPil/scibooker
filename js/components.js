@@ -1,4 +1,4 @@
-import { dataApi } from './data.js?v=33';
+import { dataApi } from './data.js?v=34';
 
 export async function renderAdminPanel() {
     const users = await dataApi.getUsers();
@@ -229,7 +229,7 @@ export async function renderMyBookings() {
                     </div>
                 </div>
             `;
-        });
+        }
     }
 
     html += `</div>`;
