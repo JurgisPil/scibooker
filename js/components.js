@@ -1,4 +1,4 @@
-import { dataApi } from './data.js?v=39';
+import { dataApi } from './data.js?v=40';
 
 export async function renderAdminPanel() {
     const users = await dataApi.getUsers();
@@ -243,7 +243,7 @@ export async function renderDashboard(searchQuery = '') {
     
     // Filter out instruments the user has no permissions for
     if (currentUser && currentUser.role !== 'admin') {
-        const allowedIds = currentUser.permissions || [];
+        const allowedIds = currentUser.allowedInstruments || [];
         instruments = instruments.filter(inst => allowedIds.includes(inst.id));
     }
     
