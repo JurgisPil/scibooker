@@ -2,32 +2,52 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
 import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyDJEOmSaSMzPlFYKA3hy4REy71qaiMvaYQ",
-    authDomain: "scibooker.firebaseapp.com",
-    projectId: "scibooker",
-    storageBucket: "scibooker.firebasestorage.app",
-    messagingSenderId: "609632954247",
-    appId: "1:609632954247:web:f6d1ccd2c65deb8ebe1522",
-    measurementId: "G-Y0JK0YYW5J"
-};
+// Check if we are in Mock Mode (GitHub Pages or missing config)
+export let isMockMode = window.location.hostname.includes('github.io');
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+let app = null;
+let firestoreDb = null;
+let authInstance = null;
+let providerInstance = null;
 
-let firestoreDb;
-try {
-    firestoreDb = initializeFirestore(app, {
-        experimentalForceLongPolling: true,
-        localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
-    });
-} catch (e) {
-    console.error("Failed to initialize Firestore with persistence, falling back to network only:", e);
-    firestoreDb = initializeFirestore(app, {
-        experimentalForceLongPolling: true
-    });
+if (!isMockMode) {
+    try {
+        const configModule = await import('./firebase-config.js');
+        const firebaseConfig = configModule.firebaseConfig;
+        
+        app = initializeApp(firebaseConfig);
+        authInstance = getAuth(app);
+        providerInstance = new GoogleAuthProvider();
+
+        try {
+            firestoreDb = initializeFirestore(app, {
+                experimentalForceLongPolling: true,
+                localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+            });
+        } catch (e) {
+            console.error("Failed to initialize Firestore with persistence, falling back to network only:", e);
+            firestoreDb = initializeFirestore(app, {
+                experimentalForceLongPolling: true
+            });
+        }
+    } catch (e) {
+        console.warn("Real config not found or failed to load. Switching to Mock Mode.", e);
+        isMockMode = true;
+    }
 }
-export const db = firestoreDb;
 
-export const googleProvider = new GoogleAuthProvider();
+if (isMockMode) {
+    console.info("Running in DEMO MODE. No real database connection.");
+    // Mock Auth
+    authInstance = {
+        onAuthStateChanged: (callback) => {
+            // Do nothing, app.js will handle mock login explicitly
+        },
+        signOut: async () => {}
+    };
+    providerInstance = {};
+}
+
+export const auth = authInstance;
+export const db = firestoreDb;
+export const googleProvider = providerInstance;
