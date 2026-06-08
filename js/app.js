@@ -1,7 +1,7 @@
-import { dataApi } from './data.js?v=28';
-import { auth, googleProvider } from './firebase.js?v=28';
+import { dataApi } from './data.js?v=29';
+import { auth, googleProvider } from './firebase.js?v=29';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
-import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=28';
+import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=29';
 
 window.addEventListener('error', function(e) {
     document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:99999;padding:20px;font-size:20px;">ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '</div>';
@@ -608,7 +608,7 @@ async function openModal(bookingId = null, prefillChannelId = null, prefillStart
         instrumentSelect.style.display = 'none';
 
         instrumentSelect.value = booking.instrumentId;
-        populateChannelSelect(booking.instrumentId);
+        await populateChannelSelect(booking.instrumentId);
         
         // Select the channel
         const checkbox = channelCheckboxGroup.querySelector(`input[value="${booking.channelId}"]`);
@@ -641,7 +641,7 @@ async function openModal(bookingId = null, prefillChannelId = null, prefillStart
         
         if (state.selectedInstrumentId) {
             instrumentSelect.value = state.selectedInstrumentId;
-            populateChannelSelect(state.selectedInstrumentId);
+            await populateChannelSelect(state.selectedInstrumentId);
             if (prefillChannelId) {
                 const checkbox = channelCheckboxGroup.querySelector(`input[value="${prefillChannelId}"]`);
                 if (checkbox) checkbox.checked = true;
