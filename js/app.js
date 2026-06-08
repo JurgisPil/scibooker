@@ -341,16 +341,23 @@ function setupEventListeners() {
                 document.getElementById('edit-inst-name').value = inst.name;
                 document.getElementById('edit-inst-desc').value = inst.description || '';
                 
-                // Try to infer channel prefix and count
-                const count = inst.channels.length;
-                let prefix = 'ch-';
-                if (count > 0 && inst.channels[0].name) {
-                    const match = inst.channels[0].name.match(/^(.*?)\s*\d+$/);
-                    if (match) prefix = match[1].trim();
-                }
+                const listContainer = document.getElementById('edit-inst-channels-list');
+                listContainer.innerHTML = '';
                 
-                document.getElementById('edit-inst-prefix').value = prefix;
-                document.getElementById('edit-inst-count').value = count;
+                (inst.channels || []).forEach(ch => {
+                    const chDiv = document.createElement('div');
+                    chDiv.className = 'channel-edit-row';
+                    chDiv.style.cssText = 'display: flex; gap: 8px; align-items: center; margin-bottom: 8px;';
+                    chDiv.innerHTML = `
+                        <input type="hidden" class="ch-id" value="${ch.id}">
+                        <input type="text" class="ch-name" value="${ch.name}" required style="flex: 1;" placeholder="Channel Name">
+                        <label style="display: flex; align-items: center; gap: 4px; font-size: 0.85rem; cursor: pointer;">
+                            <input type="checkbox" class="ch-disabled" ${ch.disabled ? 'checked' : ''}> Disabled
+                        </label>
+                        <button type="button" class="icon-btn btn-delete-channel" style="color: var(--danger-color);"><i class="ri-delete-bin-line"></i></button>
+                    `;
+                    listContainer.appendChild(chDiv);
+                });
                 
                 editInstModal.classList.remove('hidden');
             }
@@ -407,6 +414,12 @@ function setupEventListeners() {
         const ganttRowBg = e.target.closest('.gantt-row-bg');
         if (ganttRowBg && !e.target.closest('.gantt-booking')) {
             e.preventDefault();
+            
+            if (ganttRowBg.closest('.channel-disabled')) {
+                // Do nothing if channel is disabled
+                return;
+            }
+            
             const container = ganttRowBg.closest('.gantt-container');
             const viewStart = new Date(container.dataset.startDate);
             const cellWidth = parseFloat(container.dataset.cellWidth);
@@ -504,6 +517,29 @@ function setupEventListeners() {
     });
 
     // Edit Instrument Modal Logic
+    document.getElementById('btn-edit-inst-add-channel').addEventListener('click', () => {
+        const listContainer = document.getElementById('edit-inst-channels-list');
+        const chDiv = document.createElement('div');
+        chDiv.className = 'channel-edit-row';
+        chDiv.style.cssText = 'display: flex; gap: 8px; align-items: center; margin-bottom: 8px;';
+        chDiv.innerHTML = `
+            <input type="hidden" class="ch-id" value="new_${Date.now()}">
+            <input type="text" class="ch-name" value="" required style="flex: 1;" placeholder="Channel Name">
+            <label style="display: flex; align-items: center; gap: 4px; font-size: 0.85rem; cursor: pointer;">
+                <input type="checkbox" class="ch-disabled"> Disabled
+            </label>
+            <button type="button" class="icon-btn btn-delete-channel" style="color: var(--danger-color);"><i class="ri-delete-bin-line"></i></button>
+        `;
+        listContainer.appendChild(chDiv);
+    });
+
+    document.getElementById('edit-inst-channels-list').addEventListener('click', (e) => {
+        const deleteBtn = e.target.closest('.btn-delete-channel');
+        if (deleteBtn) {
+            deleteBtn.closest('.channel-edit-row').remove();
+        }
+    });
+
     closeEditBtns.forEach(btn => btn.addEventListener('click', () => {
         editInstModal.classList.add('hidden');
     }));
@@ -513,10 +549,29 @@ function setupEventListeners() {
         const id = document.getElementById('edit-inst-id').value;
         const name = document.getElementById('edit-inst-name').value.trim();
         const desc = document.getElementById('edit-inst-desc').value.trim();
-        const prefix = document.getElementById('edit-inst-prefix').value.trim();
-        const count = parseInt(document.getElementById('edit-inst-count').value);
+        
+        // Compile channels array from DOM
+        const channels = [];
+        const rows = document.querySelectorAll('.channel-edit-row');
+        rows.forEach((row, index) => {
+            const chId = row.querySelector('.ch-id').value;
+            const chName = row.querySelector('.ch-name').value.trim();
+            const chDisabled = row.querySelector('.ch-disabled').checked;
+            
+            channels.push({
+                id: chId,
+                name: chName,
+                disabled: chDisabled,
+                color: `var(--channel-${(index % 4) + 1})`
+            });
+        });
 
-        const updatedInst = dataApi.updateInstrument(id, { name, description: desc, channelPrefix: prefix, channelCount: count });
+        if (channels.length === 0) {
+            alert('Instrument must have at least one channel.');
+            return;
+        }
+
+        const updatedInst = dataApi.updateInstrument(id, { name, description: desc, channels: channels });
         if (updatedInst) {
             editInstModal.classList.add('hidden');
             populateInstrumentSelect();
@@ -684,9 +739,15 @@ async function populateChannelSelect(instrumentId) {
     if (!inst) return;
     let html = '';
     inst.channels.forEach(ch => {
-        html += `<label style="display: flex; align-items: center; gap: 4px; font-size: 0.85rem; cursor: pointer;">
-                    <input type="checkbox" value="${ch.id}" class="channel-checkbox"> ${ch.name}
-                 </label>`;
+        if (ch.disabled) {
+            html += `<label style="display: flex; align-items: center; gap: 4px; font-size: 0.85rem; cursor: not-allowed; opacity: 0.5; text-decoration: line-through;" title="Disabled for maintenance">
+                        <input type="checkbox" value="${ch.id}" class="channel-checkbox" disabled> ${ch.name}
+                     </label>`;
+        } else {
+            html += `<label style="display: flex; align-items: center; gap: 4px; font-size: 0.85rem; cursor: pointer;">
+                        <input type="checkbox" value="${ch.id}" class="channel-checkbox"> ${ch.name}
+                     </label>`;
+        }
     });
     channelCheckboxGroup.innerHTML = html;
 }

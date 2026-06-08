@@ -116,14 +116,31 @@ const RealDataApi = {
         return newInst;
     },
     async updateInstrument(id, updatedData) {
-        // If channels changed, it's more complex, but we'll do a simple replace
         const inst = await this.getInstrumentById(id);
         if (!inst) return null;
         
         const merged = { ...inst, ...updatedData };
         
-        // Handle channel resizing logic from before
-        if (updatedData.channelCount !== undefined) {
+        if (updatedData.channels) {
+            // New logic: raw channels array provided
+            // Identify orphaned channels
+            const newIds = updatedData.channels.map(c => c.id);
+            const removedIds = inst.channels.filter(c => !newIds.includes(c.id)).map(c => c.id);
+            
+            merged.channels = updatedData.channels;
+            
+            // Delete orphaned bookings
+            if (removedIds.length > 0) {
+                const q = query(collection(db, 'bookings'), where("instrumentId", "==", id));
+                const snapshot = await getDocs(q);
+                snapshot.forEach(docSnap => {
+                    if (removedIds.includes(docSnap.data().channelId)) {
+                        deleteDoc(docSnap.ref);
+                    }
+                });
+            }
+        } else if (updatedData.channelCount !== undefined) {
+            // Old logic: Prefix/Count generation
             const oldChannelCount = inst.channels.length;
             const channelPrefix = updatedData.channelPrefix || 'ch-';
             const newChannels = [];
@@ -148,13 +165,11 @@ const RealDataApi = {
                 const removedIds = removedChannels.map(c => c.id);
                 const q = query(collection(db, 'bookings'), where("instrumentId", "==", id));
                 const snapshot = await getDocs(q);
-                const batch = writeBatch(db);
-                snapshot.forEach(d => {
-                    if (removedIds.includes(d.data().channelId)) {
-                        batch.delete(d.ref);
+                snapshot.forEach(docSnap => {
+                    if (removedIds.includes(docSnap.data().channelId)) {
+                        deleteDoc(docSnap.ref);
                     }
                 });
-                await batch.commit();
             }
         }
         

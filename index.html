@@ -32,7 +32,7 @@
     <link rel="stylesheet" href="styles/calendar.css?v=14">
 </head>
 <body>
-    <div id="app" class="app-container">
+    <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; padding: 5px; font-size: 12px; z-index: 10000; pointer-events: none;">VERSION 54</div>
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo" style="padding: var(--spacing-md) var(--spacing-md);">
@@ -159,16 +159,13 @@
                         <label>Description (Optional)</label>
                         <input type="text" id="edit-inst-desc">
                     </div>
-                    <div style="display: flex; gap: var(--spacing-md);">
-                        <div class="form-group" style="flex: 1;">
-                            <label>Channel Prefix</label>
-                            <input type="text" id="edit-inst-prefix" required>
-                        </div>
-                        <div class="form-group" style="flex: 1;">
-                            <label>Number of Channels</label>
-                            <input type="number" id="edit-inst-count" required min="1" max="128">
-                        </div>
-                    </div>
+                      <div class="form-group">
+                          <label>Manage Channels</label>
+                          <div id="edit-inst-channels-list" style="display: flex; flex-direction: column; gap: var(--spacing-sm); max-height: 250px; overflow-y: auto; padding-right: 5px; border: 1px solid var(--glass-border); padding: 10px; border-radius: var(--radius-md);">
+                              <!-- Channels will be dynamically injected here -->
+                          </div>
+                          <button type="button" id="btn-edit-inst-add-channel" class="btn-secondary" style="margin-top: var(--spacing-sm); width: 100%;"><i class="ri-add-line"></i> Add Custom Channel</button>
+                      </div>
                 </form>
                 <div class="form-actions" style="display: flex; justify-content: flex-end; align-items: center; margin-top: var(--spacing-lg);">
                     <div style="display: flex; gap: var(--spacing-sm);">

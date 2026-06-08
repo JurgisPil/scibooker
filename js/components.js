@@ -397,7 +397,7 @@ export async function renderCalendarView(instrumentId, dateStr, daysToRender = 3
         });
 
         rowsHtml += `
-            <div class="gantt-row" data-channel-id="${ch.id}">
+            <div class="gantt-row ${ch.disabled ? 'channel-disabled' : ''}" data-channel-id="${ch.id}">
                 <div class="gantt-channel-label" style="border-left: 4px solid ${ch.color}">${ch.name}</div>
                 <div class="gantt-timeline-row gantt-row-bg" data-channel-id="${ch.id}" style="background-size: ${gridBgSize}px 100%; position: relative; flex: 1;">
                     ${channelBookingsHtml}
