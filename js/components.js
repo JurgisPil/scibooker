@@ -1,4 +1,4 @@
-import { dataApi } from './data.js?v=22';
+import { dataApi } from './data.js?v=23';
 
 export async function renderAdminPanel() {
     const users = await dataApi.getUsers();
@@ -414,6 +414,8 @@ export async function renderCalendarView(instrumentId, dateStr, daysToRender = 3
             channelBookingsHtml += `
                 <div class="gantt-booking ${myClass}" 
                      data-booking-id="${booking.id}"
+                     data-start="${booking.startDate}"
+                     data-end="${booking.endDate}"
                      style="left: ${leftPx}px; width: ${widthPx}px; background-color: ${bg}; color: ${color}; overflow: hidden; cursor: ${isMine ? 'grab' : 'default'};"
                      title="User: ${booking.userName}&#10;Purpose: ${booking.purpose}&#10;Date: ${booking.startDate} to ${booking.endDate}"
                 >

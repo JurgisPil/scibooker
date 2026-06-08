@@ -1,7 +1,7 @@
-import { dataApi } from './data.js?v=22';
-import { auth, googleProvider } from './firebase.js?v=22';
+import { dataApi } from './data.js?v=23';
+import { auth, googleProvider } from './firebase.js?v=23';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
-import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=22';
+import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=23';
 
 window.addEventListener('error', function(e) {
     document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:99999;padding:20px;font-size:20px;">ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '</div>';
@@ -791,9 +791,10 @@ function handleMouseDown(e) {
     
     if (bookingEl && (leftHandle || rightHandle || bookingEl.classList.contains('my-booking') || dataApi.getCurrentUser().role === 'admin')) {
         const bookingId = bookingEl.dataset.bookingId;
-        const booking = dataApi.getBookingById(bookingId);
+        const bookingStart = bookingEl.dataset.start;
+        const bookingEnd = bookingEl.dataset.end;
         const container = bookingEl.closest('.gantt-container');
-        if (!booking || !container) return;
+        if (!bookingId || !container || !bookingStart || !bookingEnd) return;
 
         // Ensure resizing/moving doesn't trigger drag-and-drop ghosting
         e.preventDefault(); 
@@ -803,8 +804,8 @@ function handleMouseDown(e) {
             bookingId: bookingId,
             element: bookingEl,
             initialX: e.clientX,
-            initialStart: new Date(booking.startDate),
-            initialEnd: new Date(booking.endDate),
+            initialStart: new Date(bookingStart),
+            initialEnd: new Date(bookingEnd),
             cellWidth: parseFloat(container.dataset.cellWidth),
             initialLeftPx: parseFloat(bookingEl.style.left),
             initialWidthPx: parseFloat(bookingEl.style.width)
