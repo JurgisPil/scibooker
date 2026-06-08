@@ -1,14 +1,15 @@
 export class MockDataApi {
     constructor() {
         this.users = [
-            { id: "mock_admin_1", uid: "mock_admin_1", email: "admin@scibooker.demo", displayName: "Demo Admin", role: "admin", allowedInstruments: [] },
-            { id: "mock_user_1", uid: "mock_user_1", email: "user@scibooker.demo", displayName: "Demo User", role: "user", allowedInstruments: ["inst_1"] }
+            { id: "mock_admin_1", uid: "mock_admin_1", email: "admin@scibooker.demo", name: "Demo Admin", avatar: "DA", role: "admin", allowedInstruments: [] },
+            { id: "mock_user_1", uid: "mock_user_1", email: "user@scibooker.demo", name: "Demo User", avatar: "DU", role: "user", allowedInstruments: ["inst_1"] }
         ];
         
         this.instruments = [
             { 
                 id: "inst_1", 
                 name: "Confocal Microscope SP8", 
+                status: "active",
                 color: "#4ade80", 
                 channels: [
                     { id: "ch_1", name: "Laser 405nm" },
@@ -19,6 +20,7 @@ export class MockDataApi {
             { 
                 id: "inst_2", 
                 name: "Flow Cytometer Aria III", 
+                status: "active",
                 color: "#60a5fa", 
                 channels: [
                     { id: "ch_1", name: "FSC/SSC" },
