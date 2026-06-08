@@ -43,10 +43,7 @@ export async function renderAdminPanel() {
     let tableHeaders = instruments.map(inst => `<th style="text-align: center; font-weight: 500; padding: 12px 8px;">${inst.name}</th>`).join('');
     let tableRows = users.map(u => {
         let cells = instruments.map(inst => {
-            if (u.role === 'admin') {
-                return `<td style="text-align: center; padding: 8px;"><i class="ri-check-line" style="color: var(--primary-color);"></i></td>`;
-            }
-            const isChecked = u.allowedInstruments.includes(inst.id) ? 'checked' : '';
+            const isChecked = (u.allowedInstruments || []).includes(inst.id) ? 'checked' : '';
             return `<td style="text-align: center; padding: 8px;">
                         <input type="checkbox" class="perm-checkbox" data-user="${u.id}" value="${inst.id}" ${isChecked}>
                     </td>`;
