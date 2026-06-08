@@ -120,13 +120,15 @@
 .gantt-corner-cell {
     position: sticky;
     left: 0;
-    width: 150px;
+    width: 80px;
     flex-shrink: 0;
     background: var(--bg-surface-elevated);
     border-right: 1px solid var(--glass-border);
     z-index: 21; /* Above header and row */
-    padding: var(--spacing-md);
-    font-weight: 600;
+    padding: var(--spacing-sm);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
 }
 
 .gantt-days-header {
@@ -171,17 +173,20 @@
 .gantt-channel-label {
     position: sticky;
     left: 0;
-    width: 150px;
+    width: 80px;
     flex-shrink: 0;
     background: var(--bg-surface);
     border-right: 1px solid var(--glass-border);
     z-index: 10;
-    padding: 0 var(--spacing-md);
     display: flex;
     align-items: center;
-    font-size: 0.85rem;
+    padding: 0 var(--spacing-sm);
     font-weight: 500;
-    color: var(--text-primary);
+    font-size: 0.9rem;
+    transition: background-color var(--transition-fast);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .gantt-row:hover .gantt-channel-label {
