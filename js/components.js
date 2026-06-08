@@ -1,4 +1,4 @@
-import { dataApi } from './data.js?v=32';
+import { dataApi } from './data.js?v=33';
 
 export async function renderAdminPanel() {
     const users = await dataApi.getUsers();
@@ -192,8 +192,8 @@ export async function renderMyBookings() {
             grouped[booking.instrumentId].push(booking);
         });
 
-        Object.keys(grouped).forEach(instId => {
-            const inst = dataApi.getInstrumentById(instId);
+        for (const instId of Object.keys(grouped)) {
+            const inst = await dataApi.getInstrumentById(instId);
             const instName = inst ? inst.name : 'Unknown Instrument';
             
             html += `

@@ -1,4 +1,4 @@
-import { db, auth } from './firebase.js?v=32';
+import { db, auth } from './firebase.js?v=33';
 import { 
     collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, writeBatch 
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
