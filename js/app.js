@@ -104,6 +104,23 @@ async function init() {
 if (isMockMode) {
     if(authOverlay) authOverlay.style.display = 'none';
     document.body.insertAdjacentHTML('beforeend', '<div style="position:fixed;top:10px;left:50%;transform:translateX(-50%);background:var(--danger,#ef4444);color:white;padding:5px 15px;border-radius:20px;font-weight:bold;z-index:10000;pointer-events:none;box-shadow:0 2px 10px rgba(0,0,0,0.3);">DEMO MODE</div>');
+    
+    // Add a button to switch between User and Admin in Demo Mode
+    const toggleBtn = document.createElement('button');
+    toggleBtn.innerHTML = 'Switch to User View';
+    toggleBtn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:10000;padding:10px 15px;background:var(--primary);color:white;border-radius:8px;cursor:pointer;border:none;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-weight:bold;transition:transform 0.2s;';
+    toggleBtn.onmouseover = () => toggleBtn.style.transform = 'scale(1.05)';
+    toggleBtn.onmouseout = () => toggleBtn.style.transform = 'scale(1)';
+    toggleBtn.onclick = async () => {
+        const currentRole = dataApi.getCurrentUser().role;
+        const newRole = currentRole === 'admin' ? 'user' : 'admin';
+        const targetUser = dataApi.users.find(u => u.role === newRole);
+        dataApi.setCurrentUser(targetUser);
+        toggleBtn.innerHTML = `Switch to ${currentRole === 'admin' ? 'Admin' : 'User'} View`;
+        init(); // Re-initialize the UI (header, nav, and render)
+    };
+    document.body.appendChild(toggleBtn);
+    
     init();
 } else {
     onAuthStateChanged(auth, async (user) => {
