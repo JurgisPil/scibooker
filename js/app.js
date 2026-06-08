@@ -1,7 +1,7 @@
-import { dataApi } from './data.js?v=26';
-import { auth, googleProvider } from './firebase.js?v=26';
+import { dataApi } from './data.js?v=27';
+import { auth, googleProvider } from './firebase.js?v=27';
 import { signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
-import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=26';
+import { renderDashboard, renderCalendarView, renderMyBookings, renderAdminPanel } from './components.js?v=27';
 
 window.addEventListener('error', function(e) {
     document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;z-index:99999;padding:20px;font-size:20px;">ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '</div>';
