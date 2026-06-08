@@ -15,8 +15,19 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = initializeFirestore(app, {
-    experimentalForceLongPolling: true,
-    localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
-});
+
+let firestoreDb;
+try {
+    firestoreDb = initializeFirestore(app, {
+        experimentalForceLongPolling: true,
+        localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+    });
+} catch (e) {
+    console.error("Failed to initialize Firestore with persistence, falling back to network only:", e);
+    firestoreDb = initializeFirestore(app, {
+        experimentalForceLongPolling: true
+    });
+}
+export const db = firestoreDb;
+
 export const googleProvider = new GoogleAuthProvider();
